@@ -1,1 +1,0 @@
-Apagar este arquivo, criei apenas para fazer commit no git.
