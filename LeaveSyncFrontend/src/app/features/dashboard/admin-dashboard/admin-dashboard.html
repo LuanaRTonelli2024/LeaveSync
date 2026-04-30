@@ -1,0 +1,132 @@
+<div class="ls-page">
+
+  <nav class="ls-navbar">
+    <img src="LeaveSync.png" alt="LeaveSync logo" class="ls-logo" />
+    <div class="ls-navbar-right">
+      <span class="ls-welcome">Welcome, {{ currentUser()?.name }}</span>
+      <button class="ls-logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="ls-content">
+
+    <div class="ls-header">
+      <h1>Admin Dashboard</h1>
+      <p>Manage your team's time off requests and your own balance</p>
+    </div>
+
+    <div *ngIf="pageError()" class="ls-error-banner">
+      {{ pageError() }}
+    </div>
+
+    <div *ngIf="isLoading()" class="ls-loading">
+      Loading...
+    </div>
+
+    <ng-container *ngIf="!isLoading()">
+
+      <div class="ls-top-section">
+
+        <div class="ls-calendar-panel">
+          <span class="ls-section-title">Team Calendar</span>
+          <div class="ls-cal-header">
+            <button class="ls-cal-nav" (click)="prevMonth()">&#9664;</button>
+            <span class="ls-cal-month">{{ getMonthName() }}</span>
+            <button class="ls-cal-nav" (click)="nextMonth()">&#9654;</button>
+          </div>
+          <div class="ls-cal-grid">
+            <div class="ls-cal-day-name" *ngFor="let d of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ d }}</div>
+            <div
+              class="ls-cal-day"
+              *ngFor="let day of getCalendarDays()"
+              [class.ls-empty]="!day"
+              [class.ls-has-event]="day && getRequestsForDay(day).length > 0">
+              <span class="ls-cal-day-num" *ngIf="day">{{ day }}</span>
+              <div
+                *ngFor="let req of getRequestsForDay(day)"
+                class="ls-cal-event"
+                [class.ls-cal-event-sick]="req.type === 'sick'">
+                {{ req.userName }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ls-pending-panel">
+          <span class="ls-section-title">Pending Approvals</span>
+
+          <div *ngIf="pendingRequests().length === 0" class="ls-no-pending">
+            No pending requests.
+          </div>
+
+          <div class="ls-pending-card" *ngFor="let req of pendingRequests()">
+            <div class="ls-pending-name">{{ req.userName }}</div>
+            <div class="ls-pending-meta">
+              {{ req.type === 'vacation' ? 'Paid Vacation' : 'Sick Leave' }} ·
+              {{ req.startDate | date:'MMM d' }} → {{ req.endDate | date:'MMM d' }} ·
+              {{ req.totalDays }} {{ req.totalDays === 1 ? 'day' : 'days' }}
+            </div>
+            <div class="ls-pending-actions">
+              <button class="ls-btn-approve" (click)="approveRequest(req._id)">Approve</button>
+              <button class="ls-btn-deny" (click)="denyRequest(req._id)">Deny</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <span class="ls-section-title">My Time Off Balance</span>
+      <div class="ls-balance-card">
+        <div class="ls-balance-item">
+          <span class="ls-balance-type">Paid Vacation</span>
+          <span class="ls-balance-days">
+            <strong>{{ vacationBalance() }}</strong> / {{ totalVacationDays() }} days available
+          </span>
+        </div>
+        <div class="ls-balance-divider"></div>
+        <div class="ls-balance-item">
+          <span class="ls-balance-type">Sick Leave</span>
+          <span class="ls-balance-days">
+            <strong>{{ sickBalance() }}</strong> / {{ totalSickDays() }} days available
+          </span>
+        </div>
+      </div>
+
+      <button class="ls-request-btn" (click)="requestLeave()">
+        + Request Leave of Absence
+      </button>
+
+      <span class="ls-section-title">My Requests</span>
+
+      <div *ngIf="myRequests().length === 0" class="ls-empty">
+        No requests yet. Click the button above to submit your first request.
+      </div>
+
+      <div class="ls-request-card" *ngFor="let request of myRequests()">
+        <div class="ls-request-info">
+          <span class="ls-request-type">
+            {{ request.type === 'vacation' ? 'Paid Vacation' : 'Sick Leave' }}
+          </span>
+          <span class="ls-request-dates">
+            {{ request.startDate | date:'MMM d, y' }} → {{ request.endDate | date:'MMM d, y' }}
+          </span>
+          <span class="ls-request-days">{{ request.totalDays }} {{ request.totalDays === 1 ? 'day' : 'days' }}</span>
+        </div>
+        <div class="ls-request-actions">
+          <span class="ls-badge"
+            [ngClass]="{
+              'ls-badge-pending': request.status === 'pending',
+              'ls-badge-approved': request.status === 'approved',
+              'ls-badge-denied': request.status === 'denied'
+            }">
+            {{ request.status | titlecase }}
+          </span>
+          <button class="ls-edit-btn" (click)="editRequest(request)">Edit</button>
+          <button class="ls-cancel-btn" (click)="cancelRequest(request._id)">Cancel</button>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>

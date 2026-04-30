@@ -1,0 +1,416 @@
+.ls-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.ls-navbar {
+  background: #1a0a0a;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ls-logo {
+  height: 36px;
+  object-fit: contain;
+}
+
+.ls-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ls-welcome {
+  font-size: 13px;
+  color: #7a4a4a;
+}
+
+.ls-logout-btn {
+  font-size: 13px;
+  color: #C0392B;
+  background: transparent;
+  border: 1px solid #C0392B;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #C0392B;
+    color: #fff;
+  }
+}
+
+.ls-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.ls-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #1a0a0a;
+  }
+
+  p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+}
+
+.ls-error-banner {
+  background: #fdecea;
+  color: #C0392B;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.ls-loading {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  padding: 3rem;
+}
+
+.ls-section-title {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.ls-top-section {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ls-calendar-panel {
+  flex: 6;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.ls-pending-panel {
+  flex: 4;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.ls-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ls-cal-month {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a0a0a;
+  text-transform: capitalize;
+}
+
+.ls-cal-nav {
+  background: transparent;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: #C0392B; color: #C0392B; }
+}
+
+.ls-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.ls-cal-day-name {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.ls-cal-day {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  padding: 4px 2px;
+  border-radius: 4px;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  &.ls-has-event {
+    background: #fff8f8;
+  }
+}
+
+.ls-cal-day-num {
+  font-size: 12px;
+  color: #555;
+}
+
+.ls-cal-event {
+  font-size: 9px;
+  background: #C0392B;
+  color: #fff;
+  border-radius: 3px;
+  padding: 1px 4px;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.ls-cal-event-sick {
+    background: #f59f00;
+  }
+}
+
+.ls-pending-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+}
+
+.ls-pending-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a0a0a;
+  margin-bottom: 2px;
+}
+
+.ls-pending-meta {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.ls-pending-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ls-btn-approve {
+  font-size: 12px;
+  background: #f0faf0;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 1;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #c8e6c9;
+    border-color: #a5d6a7;
+  }
+}
+
+.ls-btn-deny {
+  font-size: 12px;
+  background: #fdf0f0;
+  color: #C0392B;
+  border: 1px solid #f5c6c6;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 1;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #f5c6c6;
+    border-color: #ef9a9a;
+  }
+}
+
+.ls-no-pending {
+  font-size: 13px;
+  color: #aaa;
+  text-align: center;
+  padding: 1rem;
+}
+
+.ls-balance-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+}
+
+.ls-balance-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ls-balance-type {
+  font-size: 14px;
+  color: #555;
+}
+
+.ls-balance-days {
+  font-size: 13px;
+  color: #888;
+
+  strong {
+    color: #1a0a0a;
+    font-weight: 500;
+  }
+}
+
+.ls-balance-divider {
+  width: 1px;
+  height: 40px;
+  background: #eee;
+}
+
+.ls-request-btn {
+  background: #C0392B;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 2rem;
+  letter-spacing: 0.3px;
+  transition: background 0.2s;
+
+  &:hover { background: #A93226; }
+}
+
+.ls-empty {
+  font-size: 14px;
+  color: #aaa;
+  text-align: center;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.ls-request-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ls-request-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ls-request-type {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a0a0a;
+}
+
+.ls-request-dates {
+  font-size: 13px;
+  color: #888;
+}
+
+.ls-request-days {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.ls-request-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ls-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ls-badge-pending {
+  background: #fff8e1;
+  color: #f59f00;
+}
+
+.ls-badge-approved {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.ls-badge-denied {
+  background: #fdecea;
+  color: #C0392B;
+}
+
+.ls-edit-btn {
+  font-size: 12px;
+  color: #555;
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: #C0392B; color: #C0392B; }
+}
+
+.ls-cancel-btn {
+  font-size: 12px;
+  color: #C0392B;
+  background: transparent;
+  border: 1px solid #C0392B;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover { background: #C0392B; color: #fff; }
+}
