@@ -1,0 +1,178 @@
+.ls-wrap {
+  display: flex;
+  min-height: 100vh;
+}
+
+.ls-left {
+  flex: 1;
+  background: #1a0a0a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  gap: 1.5rem;
+}
+
+.ls-logo-img {
+  width: 200px;
+  object-fit: contain;
+}
+
+.ls-tagline {
+  font-size: 14px;
+  color: #7a4a4a;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.ls-features {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.ls-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  span {
+    font-size: 14px;
+    color: #7a4a4a;
+    letter-spacing: 0.5px;
+  }
+}
+
+.ls-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C0392B;
+  flex-shrink: 0;
+}
+
+.ls-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 3rem;
+  background: #fff;
+}
+
+.ls-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #1a0a0a;
+  margin: 0 0 0.25rem;
+}
+
+.ls-sub {
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 2rem;
+}
+
+.ls-field {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.ls-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.ls-label {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ls-optional {
+  font-size: 11px;
+  color: #aaa;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+
+  &:focus {
+    border-color: #C0392B;
+  }
+}
+
+.ls-error {
+  font-size: 12px;
+  color: #C0392B;
+  margin-top: 4px;
+}
+
+.ls-btn {
+  width: 100%;
+  padding: 11px;
+  background: #C0392B;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+
+  &:hover { background: #A93226; }
+  &:disabled { background: #ccc; cursor: not-allowed; }
+}
+
+.ls-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 1.5rem 0;
+}
+
+.ls-divider-line {
+  flex: 1;
+  height: 0.5px;
+  background: #eee;
+}
+
+.ls-divider-text {
+  font-size: 11px;
+  color: #aaa;
+  letter-spacing: 0.5px;
+}
+
+.ls-register {
+  font-size: 13px;
+  color: #888;
+  text-align: center;
+
+  a {
+    color: #C0392B;
+    text-decoration: none;
+    font-weight: 500;
+  }
+}

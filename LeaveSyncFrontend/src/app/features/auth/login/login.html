@@ -1,0 +1,61 @@
+<div class="ls-wrap">
+  <div class="ls-left">
+    <img src="LeaveSync.png" alt="LeaveSync logo" class="ls-logo-img" />
+    <div class="ls-tagline">Employee Time Off Management</div>
+    <div class="ls-features">
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Track vacation & sick days</span>
+      </div>
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Submit & approve requests</span>
+      </div>
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Real-time team calendar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ls-right">
+    <div class="ls-title">Welcome back</div>
+    <div class="ls-sub">Sign in to your account to continue</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <div class="ls-field">
+        <label class="ls-label">Email address</label>
+        <input type="email" formControlName="email" placeholder="you@company.com" />
+        <span class="ls-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        Please enter a valid email
+        </span>
+    </div>
+
+    <div class="ls-field">
+        <label class="ls-label">Password</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+        <span class="ls-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        Password must be at least 6 characters
+        </span>
+    </div>
+
+    <span class="ls-error" *ngIf="errorMessage()">{{ errorMessage() }}</span>
+
+    <button class="ls-btn" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
+    </button>
+
+    </form>
+
+    <div class="ls-divider">
+      <div class="ls-divider-line"></div>
+      <span class="ls-divider-text">OR</span>
+      <div class="ls-divider-line"></div>
+    </div>
+
+    <div class="ls-register">
+      Don't have an account? <a routerLink="/register">Create one</a>
+    </div>
+  </div>
+</div>

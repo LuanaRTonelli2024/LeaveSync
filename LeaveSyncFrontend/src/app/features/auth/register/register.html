@@ -1,0 +1,84 @@
+<div class="ls-wrap">
+  <div class="ls-left">
+    <img src="LeaveSync.png" alt="LeaveSync logo" class="ls-logo-img" />
+    <div class="ls-tagline">Employee Time Off Management</div>
+    <div class="ls-features">
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Track vacation & sick days</span>
+      </div>
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Submit & approve requests</span>
+      </div>
+      <div class="ls-feature-item">
+        <div class="ls-dot"></div>
+        <span>Real-time team calendar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ls-right">
+    <div class="ls-title">Create account</div>
+    <div class="ls-sub">Fill in your details to get started</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="ls-field">
+        <label class="ls-label">Full name</label>
+        <input type="text" formControlName="name" placeholder="Jane Doe" />
+        <span class="ls-error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+          Name must be at least 2 characters
+        </span>
+      </div>
+
+      <div class="ls-field">
+        <label class="ls-label">Email address</label>
+        <input type="email" formControlName="email" placeholder="you@company.com" />
+        <span class="ls-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+          Please enter a valid email
+        </span>
+      </div>
+
+      <div class="ls-field">
+        <label class="ls-label">Password</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+        <span class="ls-error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+          Password must be at least 6 characters
+        </span>
+      </div>
+
+      <div class="ls-row">
+        <div class="ls-field">
+          <label class="ls-label">Role</label>
+          <select formControlName="role">
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="ls-field">
+          <label class="ls-label">Department <span class="ls-optional">(optional)</span></label>
+          <input type="text" formControlName="department" placeholder="e.g. Engineering" />
+        </div>
+      </div>
+
+      <span class="ls-error" *ngIf="errorMessage()">{{ errorMessage() }}</span>
+
+      <button class="ls-btn" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Creating account...' : 'Create account' }}
+      </button>
+
+    </form>
+
+    <div class="ls-divider">
+      <div class="ls-divider-line"></div>
+      <span class="ls-divider-text">OR</span>
+      <div class="ls-divider-line"></div>
+    </div>
+
+    <div class="ls-register">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </div>
+  </div>
+</div>

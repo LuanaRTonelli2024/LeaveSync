@@ -1,0 +1,85 @@
+<div class="ls-page">
+
+  <nav class="ls-navbar">
+    <img src="LeaveSyncLogo.PNG" alt="LeaveSync logo" class="ls-logo" />
+    <div class="ls-navbar-right">
+      <span class="ls-welcome">Welcome, {{ currentUser()?.name }}</span>
+      <button class="ls-logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="ls-content">
+
+    <div class="ls-header">
+      <h1>My Dashboard</h1>
+      <p>Manage your time off and track your requests</p>
+    </div>
+
+    <div *ngIf="pageError()" class="ls-error-banner">
+      {{ pageError() }}
+    </div>
+
+    <div *ngIf="isLoading()" class="ls-loading">
+      Loading...
+    </div>
+
+    <ng-container *ngIf="!isLoading()">
+
+      <div class="ls-balance-section">
+        <span class="ls-section-title">Time Off Balance</span>
+        <div class="ls-balance-card">
+          <div class="ls-balance-item">
+            <span class="ls-balance-type">Paid Vacation</span>
+            <span class="ls-balance-days">
+              <strong>{{ vacationBalance() }}</strong> / {{ totalVacationDays() }} days available
+            </span>
+          </div>
+          <div class="ls-balance-divider"></div>
+          <div class="ls-balance-item">
+            <span class="ls-balance-type">Sick Leave</span>
+            <span class="ls-balance-days">
+              <strong>{{ sickBalance() }}</strong> / {{ totalSickDays() }} days available
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <button class="ls-request-btn" (click)="requestLeave()">
+        + Request Leave of Absence
+      </button>
+
+      <span class="ls-section-title">My Requests</span>
+
+      <div *ngIf="requests().length === 0" class="ls-empty">
+        No requests yet. Click the button above to submit your first request.
+      </div>
+
+      <div class="ls-request-card" *ngFor="let request of requests()">
+        <div class="ls-request-info">
+          <span class="ls-request-type">
+            {{ request.type === 'vacation' ? 'Paid Vacation' : 'Sick Leave' }}
+          </span>
+          <span class="ls-request-dates">
+            {{ request.startDate | date:'MMM d, y' }} → {{ request.endDate | date:'MMM d, y' }}
+          </span>
+          <span class="ls-request-days">{{ request.totalDays }} {{ request.totalDays === 1 ? 'day' : 'days' }}</span>
+        </div>
+
+        <div class="ls-request-actions">
+          <span class="ls-badge"
+            [ngClass]="{
+              'ls-badge-pending': request.status === 'pending',
+              'ls-badge-approved': request.status === 'approved',
+              'ls-badge-denied': request.status === 'denied'
+            }">
+            {{ request.status | titlecase }}
+          </span>
+          <button class="ls-edit-btn" (click)="editRequest(request)">Edit</button>
+          <button class="ls-cancel-btn" (click)="cancelRequest(request._id)">Cancel</button>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>
