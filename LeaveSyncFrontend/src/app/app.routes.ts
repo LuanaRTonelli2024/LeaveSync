@@ -14,6 +14,6 @@ export const routes: Routes = [
   { path: 'register', component: Register, canActivate: [guestGuard] },
   { path: 'dashboard', component: EmployeeDashboard, /*, canActivate: [authGuard]*/ },
   { path: 'admin', component: AdminDashboard, /*, canActivate: [authGuard]*/ },
-  { path: 'request-time-off', component: RequestTimeOff, canActivate: [authGuard] },
+  { path: 'request-time-off', component: RequestTimeOff, /*, canActivate: [authGuard]*/ },
   { path: '**', redirectTo: 'login' },
 ];
