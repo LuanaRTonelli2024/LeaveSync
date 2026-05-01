@@ -1,0 +1,264 @@
+.ls-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.ls-navbar {
+  background: #1a0a0a;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ls-logo {
+  height: 36px;
+  object-fit: contain;
+}
+
+.ls-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ls-welcome {
+  font-size: 13px;
+  color: #7a4a4a;
+}
+
+.ls-logout-btn {
+  font-size: 13px;
+  color: #C0392B;
+  background: transparent;
+  border: 1px solid #C0392B;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #C0392B;
+    color: #fff;
+  }
+}
+
+.ls-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.ls-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #1a0a0a;
+  }
+
+  p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+}
+
+.ls-error-banner {
+  background: #fdecea;
+  color: #C0392B;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.ls-main {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.ls-calendar-panel {
+  flex: 6;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.ls-form-panel {
+  flex: 4;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ls-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ls-cal-month {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a0a0a;
+  text-transform: capitalize;
+}
+
+.ls-cal-nav {
+  background: transparent;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: #C0392B; color: #C0392B; }
+}
+
+.ls-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.ls-cal-day-name {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.ls-cal-day {
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 4px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover:not(.ls-empty):not(.ls-weekend) {
+    background: #fdecea;
+  }
+
+  &.ls-empty {
+    cursor: default;
+  }
+
+  &.ls-weekend {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+
+  &.ls-selected {
+    background: #fdecea;
+    color: #C0392B;
+  }
+
+  &.ls-selected-start,
+  &.ls-selected-end {
+    background: #C0392B;
+    color: #fff;
+    font-weight: 500;
+  }
+}
+
+.ls-cal-day-num {
+  font-size: 13px;
+}
+
+.ls-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ls-label {
+  font-size: 12px;
+  color: #555;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+select,
+input[type='date'] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s;
+
+  &:focus { border-color: #C0392B; }
+}
+
+.ls-balance-hint {
+  font-size: 12px;
+  color: #888;
+}
+
+.ls-days-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f5f5;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #555;
+
+  strong {
+    font-size: 16px;
+    color: #C0392B;
+  }
+}
+
+.ls-submit-btn {
+  width: 100%;
+  padding: 11px;
+  background: #C0392B;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: #A93226; }
+  &:disabled { background: #ccc; cursor: not-allowed; }
+}
+
+.ls-back-btn {
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  color: #888;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: #C0392B; color: #C0392B; }
+}

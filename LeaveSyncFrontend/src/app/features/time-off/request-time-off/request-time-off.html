@@ -1,1 +1,99 @@
-<p>request-time-off works!</p>
+<div class="ls-page">
+
+  <nav class="ls-navbar">
+    <img src="LeaveSync.png" alt="LeaveSync logo" class="ls-logo" />
+    <div class="ls-navbar-right">
+      <span class="ls-welcome">Welcome, {{ currentUser()?.name }}</span>
+      <button class="ls-logout-btn" (click)="goBack()">Back</button>
+    </div>
+  </nav>
+
+  <div class="ls-content">
+
+    <div class="ls-header">
+      <h1>{{ editingRequestId() ? 'Edit Request' : 'Time Off Request' }}</h1>
+      <p>Select the type and days of leave of absence</p>
+    </div>
+
+    <div *ngIf="pageError()" class="ls-error-banner">
+      {{ pageError() }}
+    </div>
+
+    <div class="ls-main">
+
+      <div class="ls-calendar-panel">
+        <div class="ls-cal-header">
+          <button class="ls-cal-nav" (click)="prevMonth()">&#9664;</button>
+          <span class="ls-cal-month">{{ getMonthName() }}</span>
+          <button class="ls-cal-nav" (click)="nextMonth()">&#9654;</button>
+        </div>
+        <div class="ls-cal-grid">
+          <div class="ls-cal-day-name" *ngFor="let d of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ d }}</div>
+          <div
+            *ngFor="let day of getCalendarDays()"
+            class="ls-cal-day"
+            [class.ls-empty]="!day"
+            [class.ls-weekend]="day && isWeekend(day)"
+            [class.ls-selected]="day && isDaySelected(day)"
+            [class.ls-selected-start]="day && isDayStart(day)"
+            [class.ls-selected-end]="day && isDayEnd(day)"
+            (click)="onDayClick(day)">
+            <span class="ls-cal-day-num" *ngIf="day">{{ day }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ls-form-panel">
+
+        <div class="ls-field">
+          <label class="ls-label">Type of Leave</label>
+          <select [(ngModel)]="selectedType" (ngModelChange)="onTypeChange($event)">
+            <option value="vacation">Paid Vacation</option>
+            <option value="sick">Sick Leave</option>
+          </select>
+          <span class="ls-balance-hint">
+            {{ selectedType() === 'vacation' ? availableVacationDays() : availableSickDays() }}
+            days available
+          </span>
+        </div>
+
+        <div class="ls-field">
+          <label class="ls-label">First Day of Leave</label>
+          <input
+            type="date"
+            [(ngModel)]="pickerStart"
+            (ngModelChange)="onPickerStartChange($event)"
+          />
+        </div>
+
+        <div class="ls-field">
+          <label class="ls-label">Last Day of Leave</label>
+          <input
+            type="date"
+            [(ngModel)]="pickerEnd"
+            (ngModelChange)="onPickerEndChange($event)"
+          />
+        </div>
+
+        <div class="ls-days-summary" *ngIf="totalSelectedDays() > 0">
+          <span>Total working days selected:</span>
+          <strong>{{ totalSelectedDays() }}</strong>
+        </div>
+
+        <button
+          class="ls-submit-btn"
+          (click)="submit()"
+          [disabled]="isSubmitting() || totalSelectedDays() === 0">
+          {{ isSubmitting() ? 'Submitting...' : (editingRequestId() ? 'Update Request' : 'Request Leave') }}
+        </button>
+
+        <button class="ls-back-btn" (click)="goBack()">
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
