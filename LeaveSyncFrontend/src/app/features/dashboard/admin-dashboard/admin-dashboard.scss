@@ -414,3 +414,133 @@
 
   &:hover { background: #C0392B; color: #fff; }
 }
+
+.ls-policy-section {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.ls-policy-panel {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.ls-policy-subtitle {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a0a0a;
+  margin-bottom: 4px;
+}
+
+.ls-policy-description {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.ls-policy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+
+  thead tr {
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  td {
+    font-size: 13px;
+    color: #555;
+    padding: 8px 8px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+}
+
+.ls-policy-empty {
+  font-size: 13px;
+  color: #aaa;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.ls-policy-delete-btn {
+  font-size: 11px;
+  color: #C0392B;
+  background: transparent;
+  border: 1px solid #f5c6c6;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #C0392B;
+    color: #fff;
+  }
+}
+
+.ls-policy-add-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.ls-policy-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #C0392B;
+  }
+}
+
+.ls-policy-add-btn {
+  white-space: nowrap;
+  padding: 8px 14px;
+  background: #1a0a0a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #C0392B;
+  }
+}
+
+.ls-sick-current {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 1rem;
+  padding: 10px 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+
+  strong {
+    color: #1a0a0a;
+    font-weight: 500;
+  }
+}
