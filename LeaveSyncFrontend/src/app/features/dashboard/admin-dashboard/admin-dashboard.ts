@@ -78,7 +78,11 @@ export class AdminDashboard implements OnDestroy {
         next: (response) => {
           const all = response.data.requests;
           this.allRequests.set(all);
-          this.pendingRequests.set(all.filter(r => r.status === 'pending'));
+          this.pendingRequests.set(
+            all
+              .filter(r => r.status === 'pending')
+              .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+          );
           const myId = this.currentUser()?._id;
           const mine = all.filter(r => r.userId === myId);
           this.myRequests.set(mine);

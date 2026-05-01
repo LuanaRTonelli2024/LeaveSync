@@ -2,9 +2,9 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const generateToken = (id, email) => {
+const generateToken = (id, email, name) => {
     const jwtSecret = process.env.JWT_SECRET;
-    return jwt.sign({ id, email }, jwtSecret, { expiresIn: "1d" });
+    return jwt.sign({ id, email, name }, jwtSecret, { expiresIn: "1d" });
 };
 
 const serializeUser = (user) => ({
@@ -83,7 +83,7 @@ const login = async (req, res) => {
             });
         }
 
-        const token = generateToken(String(user._id), user.email);
+        const token = generateToken(String(user._id), user.email, user.name);
 
         return res.json({
             message: "Login successful.",
