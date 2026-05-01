@@ -12,8 +12,13 @@ interface LeavePolicyPayload {
   type?: 'vacation' | 'sick';
   totalDays?: number;
   minYears?: number;
-  maxYears?: number;
   description?: string;
+}
+
+interface MyBalance {
+  vacationDays: number;
+  sickDays: number;
+  yearsOfService: number;
 }
 
 @Injectable({
@@ -28,6 +33,10 @@ export class LeavePolicyService {
 
   getPolicy(policyId: string) {
     return this.http.get<ApiResponse<{ policy: LeavePolicy }>>(`${environment.apiUrl}/policies/${policyId}`);
+  }
+
+  getMyBalance() {
+    return this.http.get<ApiResponse<MyBalance>>(`${environment.apiUrl}/policies/my-balance`);
   }
 
   createPolicy(payload: LeavePolicyPayload) {

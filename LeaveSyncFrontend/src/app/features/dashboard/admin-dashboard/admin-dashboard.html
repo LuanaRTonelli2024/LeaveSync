@@ -126,6 +126,89 @@
         </div>
       </div>
 
+      <!-- Leave Policy Management -->
+      <span class="ls-section-title">Leave Policy Management</span>
+
+      <div *ngIf="policyError()" class="ls-error-banner">
+        {{ policyError() }}
+      </div>
+
+      <div class="ls-policy-section">
+
+        <!-- Vacation Policies -->
+        <div class="ls-policy-panel">
+          <span class="ls-policy-subtitle">Paid Vacation</span>
+          <p class="ls-policy-description">Days granted based on years of service.</p>
+
+          <table class="ls-policy-table">
+            <thead>
+              <tr>
+                <th>Min. Years</th>
+                <th>Vacation Days</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="vacationPolicies().length === 0">
+                <td colspan="3" class="ls-policy-empty">No vacation policies configured.</td>
+              </tr>
+              <tr *ngFor="let policy of vacationPolicies()">
+                <td>{{ policy.minYears }} {{ policy.minYears === 1 ? 'year' : 'years' }}</td>
+                <td>{{ policy.totalDays }} days</td>
+                <td>
+                  <button class="ls-policy-delete-btn" (click)="deleteVacationPolicy(policy._id)">Remove</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="ls-policy-add-row">
+            <input
+              class="ls-policy-input"
+              type="number"
+              min="0"
+              placeholder="Min. years"
+              [ngModel]="newVacationMinYears()"
+              (ngModelChange)="newVacationMinYears.set($event)" />
+            <input
+              class="ls-policy-input"
+              type="number"
+              min="1"
+              placeholder="Days"
+              [ngModel]="newVacationTotalDays()"
+              (ngModelChange)="newVacationTotalDays.set($event)" />
+            <button class="ls-policy-add-btn" (click)="addVacationPolicy()">+ Add Row</button>
+          </div>
+        </div>
+
+        <!-- Sick Leave Policy -->
+        <div class="ls-policy-panel">
+          <span class="ls-policy-subtitle">Sick Leave</span>
+          <p class="ls-policy-description">Fixed number of days for all employees.</p>
+
+          <div class="ls-sick-current" *ngIf="sickPolicies().length > 0">
+            Current: <strong>{{ sickPolicies()[0].totalDays }} days</strong> per year
+          </div>
+          <div class="ls-sick-current" *ngIf="sickPolicies().length === 0">
+            No sick leave policy configured.
+          </div>
+
+          <div class="ls-policy-add-row">
+            <input
+              class="ls-policy-input"
+              type="number"
+              min="1"
+              placeholder="Days"
+              [ngModel]="newSickTotalDays()"
+              (ngModelChange)="newSickTotalDays.set($event)" />
+            <button class="ls-policy-add-btn" (click)="saveSickPolicy()">
+              {{ sickPolicies().length > 0 ? 'Update' : 'Set' }} Sick Days
+            </button>
+          </div>
+        </div>
+
+      </div>
+
     </ng-container>
 
   </div>

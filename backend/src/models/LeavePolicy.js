@@ -16,10 +16,6 @@ const leavePolicySchema = new mongoose.Schema(
             required: true,
             default: 0
         },
-        maxYears: {
-            type: Number,
-            default: null
-        },
         description: {
             type: String,
             trim: true

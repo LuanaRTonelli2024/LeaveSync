@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,19 +6,20 @@ import { finalize } from 'rxjs/operators';
 
 import { Auth } from '../../../core/services/auth';
 import { TimeOff } from '../../../core/services/time-off';
+import { LeavePolicyService } from '../../../core/services/leave-policy';
 import { TimeOffRequest } from '../../../core/models/time-off-request';
-import { User } from '../../../core/models/user';
 
 @Component({
   selector: 'app-request-time-off',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './request-time-off.html',
   styleUrl: './request-time-off.scss',
 })
 export class RequestTimeOff {
   private readonly authService = inject(Auth);
   private readonly timeOffService = inject(TimeOff);
+  private readonly leavePolicyService = inject(LeavePolicyService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -37,10 +38,8 @@ export class RequestTimeOff {
   readonly currentMonth = signal<number>(new Date().getMonth());
   readonly currentYear = signal<number>(new Date().getFullYear());
 
-  // MOCK — reemplazar con valores reales del balance del usuario desde el backend
-  readonly availableVacationDays = signal<number>(15);
-  readonly availableSickDays = signal<number>(5);
-  // END MOCK
+  readonly availableVacationDays = signal<number>(0);
+  readonly availableSickDays = signal<number>(0);
 
   readonly isSubmitting = signal(false);
   readonly pageError = signal('');
@@ -59,12 +58,27 @@ export class RequestTimeOff {
   });
 
   constructor() {
-    const id = this.route.snapshot.queryParams['id']; //para tomar el id del url
+    this.loadBalances();
+
+    const id = this.route.snapshot.queryParams['id'];
     if (id) {
       this.editingRequestId.set(id);
       this.loadRequestForEditing(id);
     }
   }
+
+  private loadBalances(): void {
+  this.leavePolicyService.getMyBalance().subscribe({
+    next: (response) => {
+      this.availableVacationDays.set(response.data.vacationDays);
+      this.availableSickDays.set(response.data.sickDays);
+    },
+    error: () => {
+      this.pageError.set('Could not load leave policies.');
+    },
+  });
+}
+
 
   private loadRequestForEditing(id: string): void {
     this.timeOffService.getMyRequests().subscribe({
@@ -186,7 +200,7 @@ export class RequestTimeOff {
   onPickerEndChange(value: string): void {
     if (!value || !this.selectedStart()) return;
     const date = new Date(value + 'T00:00:00');
-        
+
     if (date < this.selectedStart()!) {
       this.pageError.set('End date cannot be before start date.');
       return;
