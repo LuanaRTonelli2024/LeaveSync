@@ -202,7 +202,10 @@ export class RequestTimeOff {
   // sincronizacion picker y calendario
   onPickerStartChange(value: string): void {
     if (!value) return;
-    const date = new Date(value + 'T00:00:00');
+    let date = new Date(value + 'T00:00:00');
+
+    if (date.getDay() === 6) date.setDate(date.getDate() + 2);
+    if (date.getDay() === 0) date.setDate(date.getDate() + 1);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -221,7 +224,10 @@ export class RequestTimeOff {
 
   onPickerEndChange(value: string): void {
     if (!value || !this.selectedStart()) return;
-    const date = new Date(value + 'T00:00:00');
+    let date = new Date(value + 'T00:00:00');
+
+    if (date.getDay() === 6) date.setDate(date.getDate() + 2);
+    if (date.getDay() === 0) date.setDate(date.getDate() + 1);
 
     if (date < this.selectedStart()!) {
       this.pageError.set('End date cannot be before start date.');
@@ -304,4 +310,5 @@ export class RequestTimeOff {
   private toDateString(date: Date): string {
     return date.toISOString().split('T')[0];
   }
+
 }
