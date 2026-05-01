@@ -1,6 +1,61 @@
 const mongoose = require("mongoose");
 const TimeOffRequest = require("../models/TimeOffRequest");
+const LeavePolicy = require("../models/LeavePolicy");
+const User = require("../models/User");
 const { emitRequestCreated, emitRequestUpdated, emitRequestDeleted } = require("../socket");
+
+// Helper: calculate available balance for a user and type in the current year
+const calculateAvailableBalance = async (userId, type, excludeRequestId = null) => {
+    const user = await User.findById(userId);
+    if (!user) return 0;
+
+    const currentYear = new Date().getFullYear();
+
+    // Calculate years of service based on hireDate
+    const now = new Date();
+    const hireDate = new Date(user.hireDate);
+    const yearsOfService = Math.floor((now - hireDate) / (1000 * 60 * 60 * 24 * 365.25));
+
+    // Find the applicable policy
+    let totalDays = 0;
+    if (type === "vacation") {
+        const vacationPolicies = await LeavePolicy.find({ type: "vacation" }).sort({ minYears: -1 });
+        const policy = vacationPolicies.find(p => p.minYears <= yearsOfService);
+        totalDays = policy ? policy.totalDays : 0;
+    } else if (type === "sick") {
+        const sickPolicies = await LeavePolicy.find({ type: "sick" }).sort({ minYears: 1 });
+        totalDays = sickPolicies[0] ? sickPolicies[0].totalDays : 0;
+    }
+
+    // Sum approved days of the same type in the current year (excluding current request if editing)
+    const query = {
+        userId,
+        type,
+        status: "approved",
+        startDate: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lte: new Date(`${currentYear}-12-31`)
+        }
+    };
+
+    if (excludeRequestId) {
+        query._id = { $ne: excludeRequestId };
+    }
+
+    const approvedRequests = await TimeOffRequest.find(query);
+    const usedDays = approvedRequests.reduce((acc, r) => acc + r.totalDays, 0);
+
+    return totalDays - usedDays;
+};
+
+// Helper: check if a date is in the past (before today)
+const isPastDate = (dateStr) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const date = new Date(dateStr);
+    date.setHours(0, 0, 0, 0);
+    return date < today;
+};
 
 const createRequest = async (req, res) => {
     try {
@@ -12,6 +67,19 @@ const createRequest = async (req, res) => {
 
         if (!type || !startDate || !endDate || !totalDays) {
             return res.status(400).json({ message: "Type, startDate, endDate and totalDays are required." });
+        }
+
+        // Validate start date is not in the past
+        if (isPastDate(startDate)) {
+            return res.status(400).json({ message: "Start date cannot be in the past." });
+        }
+
+        // Validate balance
+        const available = await calculateAvailableBalance(req.user.id, type);
+        if (totalDays > available) {
+            return res.status(400).json({
+                message: `Insufficient balance. You have ${available} ${type} days available for this year.`
+            });
         }
 
         const request = await TimeOffRequest.create({
@@ -103,6 +171,22 @@ const updateRequest = async (req, res) => {
 
         const { type, startDate, endDate, totalDays } = req.body;
 
+        // Validate start date is not in the past
+        const newStartDate = startDate || request.startDate;
+        if (isPastDate(newStartDate)) {
+            return res.status(400).json({ message: "Start date cannot be in the past." });
+        }
+
+        // Validate balance (exclude current request from used days calculation)
+        const requestType = type || request.type;
+        const requestTotalDays = totalDays || request.totalDays;
+        const available = await calculateAvailableBalance(req.user.id, requestType, id);
+        if (requestTotalDays > available) {
+            return res.status(400).json({
+                message: `Insufficient balance. You have ${available} ${requestType} days available for this year.`
+            });
+        }
+
         const updatePayload = {};
         if ("type" in req.body) updatePayload.type = type;
         if ("startDate" in req.body) updatePayload.startDate = startDate;
@@ -174,21 +258,31 @@ const approveRequest = async (req, res) => {
             return res.status(400).json({ message: "Invalid request id." });
         }
 
-        const request = await TimeOffRequest.findByIdAndUpdate(
-            id,
-            { status: "approved" },
-            { new: true, runValidators: true }
-        );
+        const request = await TimeOffRequest.findById(id);
 
         if (!request) {
             return res.status(404).json({ message: "Request not found." });
         }
 
-        emitRequestUpdated(request);
+        // Validate balance before approving
+        const available = await calculateAvailableBalance(request.userId, request.type, id);
+        if (request.totalDays > available) {
+            return res.status(400).json({
+                message: `Cannot approve. Employee has insufficient balance. Available: ${available} ${request.type} days for this year.`
+            });
+        }
+
+        const updatedRequest = await TimeOffRequest.findByIdAndUpdate(
+            id,
+            { status: "approved" },
+            { new: true, runValidators: true }
+        );
+
+        emitRequestUpdated(updatedRequest);
 
         return res.status(200).json({
             message: "Request approved successfully.",
-            data: { request }
+            data: { request: updatedRequest }
         });
     } catch (error) {
         console.log(error);
