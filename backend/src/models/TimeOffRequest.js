@@ -17,12 +17,12 @@ const timeOffRequestSchema = new mongoose.Schema(
             required: true
         },
         startDate: {
-            type: Date,
-            required: true
+        type: String,
+        required: true
         },
         endDate: {
-            type: Date,
-            required: true
+        type: String,
+        required: true
         },
         totalDays: {
             type: Number,
