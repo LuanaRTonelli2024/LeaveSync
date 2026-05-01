@@ -84,7 +84,10 @@ export class AdminDashboard implements OnDestroy {
               .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
           );
           const myId = this.currentUser()?._id;
-          const mine = all.filter(r => r.userId === myId);
+          const mine = all.filter(r => {
+            const id = typeof r.userId === 'string' ? r.userId : (r.userId as any)?._id;
+            return id === myId;
+          });
           this.myRequests.set(mine);
         },
         error: (error) => {
@@ -263,7 +266,10 @@ export class AdminDashboard implements OnDestroy {
         this.allRequests.set(all);
         this.pendingRequests.set(all.filter(r => r.status === 'pending'));
         const myId = this.currentUser()?._id;
-        const mine = all.filter(r => r.userId === myId);
+        const mine = all.filter(r => {
+          const id = typeof r.userId === 'string' ? r.userId : (r.userId as any)?._id; // para ver datos request del admin
+          return id === myId;
+        });
         this.myRequests.set(mine);
         this.loadBalances();
       },
