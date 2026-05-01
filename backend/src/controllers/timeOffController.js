@@ -11,12 +11,10 @@ const calculateAvailableBalance = async (userId, type, excludeRequestId = null) 
 
     const currentYear = new Date().getFullYear();
 
-    // Calculate years of service based on hireDate
     const now = new Date();
     const hireDate = new Date(user.hireDate);
     const yearsOfService = Math.floor((now - hireDate) / (1000 * 60 * 60 * 24 * 365.25));
 
-    // Find the applicable policy
     let totalDays = 0;
     if (type === "vacation") {
         const vacationPolicies = await LeavePolicy.find({ type: "vacation" }).sort({ minYears: -1 });
@@ -27,7 +25,6 @@ const calculateAvailableBalance = async (userId, type, excludeRequestId = null) 
         totalDays = sickPolicies[0] ? sickPolicies[0].totalDays : 0;
     }
 
-    // Sum approved days of the same type in the current year (excluding current request if editing)
     const query = {
         userId,
         type,
@@ -69,12 +66,10 @@ const createRequest = async (req, res) => {
             return res.status(400).json({ message: "Type, startDate, endDate and totalDays are required." });
         }
 
-        // Validate start date is not in the past
         if (isPastDate(startDate)) {
             return res.status(400).json({ message: "Start date cannot be in the past." });
         }
 
-        // Validate balance
         const available = await calculateAvailableBalance(req.user.id, type);
         if (totalDays > available) {
             return res.status(400).json({
@@ -165,19 +160,18 @@ const updateRequest = async (req, res) => {
             return res.status(403).json({ message: "You can only edit your own requests." });
         }
 
-        if (request.status !== "pending") {
-            return res.status(400).json({ message: "Only pending requests can be edited." });
+        // Only denied requests cannot be edited
+        if (request.status === "denied") {
+            return res.status(400).json({ message: "Denied requests cannot be edited." });
         }
 
         const { type, startDate, endDate, totalDays } = req.body;
 
-        // Validate start date is not in the past
         const newStartDate = startDate || request.startDate;
         if (isPastDate(newStartDate)) {
             return res.status(400).json({ message: "Start date cannot be in the past." });
         }
 
-        // Validate balance (exclude current request from used days calculation)
         const requestType = type || request.type;
         const requestTotalDays = totalDays || request.totalDays;
         const available = await calculateAvailableBalance(req.user.id, requestType, id);
@@ -187,7 +181,7 @@ const updateRequest = async (req, res) => {
             });
         }
 
-        const updatePayload = {};
+        const updatePayload = { status: "pending" };
         if ("type" in req.body) updatePayload.type = type;
         if ("startDate" in req.body) updatePayload.startDate = startDate;
         if ("endDate" in req.body) updatePayload.endDate = endDate;
