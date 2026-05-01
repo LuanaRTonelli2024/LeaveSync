@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
         department: {
             type: String,
             trim: true
+        },
+        hireDate: {
+            type: Date,
+            required: true
         }
     },
     {
@@ -34,5 +38,4 @@ const userSchema = new mongoose.Schema(
 );
 
 const User = mongoose.model("User", userSchema);
-
 module.exports = User;

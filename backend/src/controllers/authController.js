@@ -13,21 +13,21 @@ const serializeUser = (user) => ({
     email: user.email,
     role: user.role,
     department: user.department,
+    hireDate: user.hireDate,
     createdAt: user.createdAt,
 });
 
 const register = async (req, res) => {
     try {
-        const { name, email, password, role, department } = req.body;
+        const { name, email, password, role, department, hireDate } = req.body;
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !hireDate) {
             return res.status(400).json({
-                message: "Name, email and password are required."
+                message: "Name, email, password and hire date are required."
             });
         }
 
         const existingUser = await User.findOne({ email: String(email).toLowerCase() });
-
         if (existingUser) {
             return res.status(409).json({
                 message: "Email is already registered."
@@ -41,7 +41,8 @@ const register = async (req, res) => {
             email,
             password: hashedPassword,
             role: role || "employee",
-            department
+            department,
+            hireDate: new Date(hireDate)
         });
 
         return res.status(201).json({
@@ -69,7 +70,6 @@ const login = async (req, res) => {
         }
 
         const user = await User.findOne({ email: String(email).toLowerCase() });
-
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password."
@@ -77,7 +77,6 @@ const login = async (req, res) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
-
         if (!isPasswordValid) {
             return res.status(401).json({
                 message: "Invalid email or password."
@@ -108,7 +107,6 @@ const getMe = async (req, res) => {
         }
 
         const user = await User.findById(req.user.id).select("-password");
-
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }

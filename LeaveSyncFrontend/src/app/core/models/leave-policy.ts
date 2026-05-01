@@ -3,6 +3,5 @@ export interface LeavePolicy {
     type: 'vacation' | 'sick';
     totalDays: number;
     minYears: number;
-    maxYears?: number;
     description?: string;
 }

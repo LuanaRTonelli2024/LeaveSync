@@ -27,6 +27,7 @@ export class Register {
     password: ['', [Validators.required, Validators.minLength(6)]],
     role: ['employee' as 'employee' | 'admin', Validators.required],
     department: [''],
+    hireDate: ['', Validators.required],
   });
 
   submit(): void {
@@ -46,6 +47,7 @@ export class Register {
         password: this.form.controls.password.getRawValue(),
         role: this.form.controls.role.getRawValue(),
         department: this.form.controls.department.getRawValue() || undefined,
+        hireDate: this.form.controls.hireDate.getRawValue(),
       })
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({

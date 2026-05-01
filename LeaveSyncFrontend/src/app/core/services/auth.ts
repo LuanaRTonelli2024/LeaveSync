@@ -16,6 +16,7 @@ interface RegisterPayload {
   password: string;
   role: 'employee' | 'admin';
   department?: string;
+  hireDate: string;
 }
 
 interface AuthData {

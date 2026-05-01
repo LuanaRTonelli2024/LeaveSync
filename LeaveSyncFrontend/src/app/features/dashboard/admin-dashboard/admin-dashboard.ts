@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
@@ -8,12 +9,13 @@ import { TimeOff } from '../../../core/services/time-off';
 import { LeavePolicyService } from '../../../core/services/leave-policy';
 import { RealtimeService } from '../../../core/services/realtime';
 import { TimeOffRequest } from '../../../core/models/time-off-request';
+import { LeavePolicy } from '../../../core/models/leave-policy';
 import { User } from '../../../core/models/user';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, FormsModule],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.scss',
 })
@@ -41,9 +43,19 @@ export class AdminDashboard implements OnDestroy {
   readonly isLoading = signal(true);
   readonly pageError = signal('');
 
+  // Leave policy management
+  readonly vacationPolicies = signal<LeavePolicy[]>([]);
+  readonly sickPolicies = signal<LeavePolicy[]>([]);
+  readonly policyError = signal('');
+
+  readonly newVacationMinYears = signal<number>(0);
+  readonly newVacationTotalDays = signal<number>(0);
+  readonly newSickTotalDays = signal<number>(0);
+
   constructor() {
     this.loadDashboard();
     this.loadBalances();
+    this.loadPolicies();
 
     this.realtimeService.connect(
       () => this.refreshRequests(),
@@ -79,17 +91,14 @@ export class AdminDashboard implements OnDestroy {
   }
 
   private loadBalances(): void {
-    this.leavePolicyService.getPolicies().subscribe({
+    this.leavePolicyService.getMyBalance().subscribe({
       next: (response) => {
-        const policies = response.data.policies;
-        const vacation = policies.find(p => p.type === 'vacation');
-        const sick = policies.find(p => p.type === 'sick');
-        this.totalVacationDays.set(vacation?.totalDays ?? 0);
-        this.totalSickDays.set(sick?.totalDays ?? 0);
+        this.totalVacationDays.set(response.data.vacationDays);
+        this.totalSickDays.set(response.data.sickDays);
         this.recalcBalances();
       },
       error: (error) => {
-        this.pageError.set(error.error?.message ?? 'Could not load leave policies.');
+        this.pageError.set(error.error?.message ?? 'Could not load leave balance.');
       },
     });
   }
@@ -102,6 +111,83 @@ export class AdminDashboard implements OnDestroy {
     this.sickBalance.set(this.totalSickDays() - usedSick);
   }
 
+  // Policy management
+  loadPolicies(): void {
+    this.leavePolicyService.getPolicies().subscribe({
+      next: (response) => {
+        const policies = response.data.policies;
+        this.vacationPolicies.set(policies.filter(p => p.type === 'vacation'));
+        this.sickPolicies.set(policies.filter(p => p.type === 'sick'));
+      },
+      error: () => {
+        this.policyError.set('Could not load policies.');
+      },
+    });
+  }
+
+  addVacationPolicy(): void {
+    const minYears = this.newVacationMinYears();
+    const totalDays = this.newVacationTotalDays();
+
+    if (minYears < 0 || totalDays <= 0) {
+      this.policyError.set('Please enter valid values for the vacation policy.');
+      return;
+    }
+
+    this.policyError.set('');
+    this.leavePolicyService.createPolicy({ type: 'vacation', minYears, totalDays }).subscribe({
+      next: () => {
+        this.newVacationMinYears.set(0);
+        this.newVacationTotalDays.set(0);
+        this.loadPolicies();
+        this.loadBalances();
+      },
+      error: () => {
+        this.policyError.set('Could not add vacation policy.');
+      },
+    });
+  }
+
+  deleteVacationPolicy(policyId: string): void {
+    this.leavePolicyService.deletePolicy(policyId).subscribe({
+      next: () => {
+        this.loadPolicies();
+        this.loadBalances();
+      },
+      error: () => {
+        this.policyError.set('Could not delete vacation policy.');
+      },
+    });
+  }
+
+  saveSickPolicy(): void {
+    const totalDays = this.newSickTotalDays();
+
+    if (totalDays <= 0) {
+      this.policyError.set('Please enter a valid number of sick days.');
+      return;
+    }
+
+    this.policyError.set('');
+    const existing = this.sickPolicies()[0];
+
+    const action$ = existing
+      ? this.leavePolicyService.updatePolicy(existing._id, { totalDays })
+      : this.leavePolicyService.createPolicy({ type: 'sick', minYears: 0, totalDays });
+
+    action$.subscribe({
+      next: () => {
+        this.newSickTotalDays.set(0);
+        this.loadPolicies();
+        this.loadBalances();
+      },
+      error: () => {
+        this.policyError.set('Could not save sick leave policy.');
+      },
+    });
+  }
+
+  // Calendar
   getCalendarDays(): (number | null)[] {
     const firstDay = new Date(this.currentYear(), this.currentMonth(), 1).getDay();
     const daysInMonth = new Date(this.currentYear(), this.currentMonth() + 1, 0).getDate();
