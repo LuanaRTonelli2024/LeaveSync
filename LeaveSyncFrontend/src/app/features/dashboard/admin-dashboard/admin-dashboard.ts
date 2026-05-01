@@ -1,11 +1,12 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
 import { Auth } from '../../../core/services/auth';
 import { TimeOff } from '../../../core/services/time-off';
 import { LeavePolicyService } from '../../../core/services/leave-policy';
+import { RealtimeService } from '../../../core/services/realtime';
 import { TimeOffRequest } from '../../../core/models/time-off-request';
 import { User } from '../../../core/models/user';
 
@@ -16,27 +17,23 @@ import { User } from '../../../core/models/user';
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.scss',
 })
-export class AdminDashboard {
+export class AdminDashboard implements OnDestroy {
   private readonly authService = inject(Auth);
   private readonly timeOffService = inject(TimeOff);
   private readonly leavePolicyService = inject(LeavePolicyService);
+  private readonly realtimeService = inject(RealtimeService);
   private readonly router = inject(Router);
 
   readonly currentUser = computed(() => this.authService.currentUser() as User | null);
 
   readonly allRequests = signal<TimeOffRequest[]>([]);
-
   readonly pendingRequests = signal<TimeOffRequest[]>([]);
-
   readonly myRequests = signal<TimeOffRequest[]>([]);
 
   readonly vacationBalance = signal<number>(0);
   readonly sickBalance = signal<number>(0);
-
-  // MOCK — reemplazar con valores de LeavePolicyService
-  readonly totalVacationDays = signal<number>(15);
-  readonly totalSickDays = signal<number>(5);
-  // END MOCK
+  readonly totalVacationDays = signal<number>(0);
+  readonly totalSickDays = signal<number>(0);
 
   readonly currentMonth = signal<number>(new Date().getMonth());
   readonly currentYear = signal<number>(new Date().getFullYear());
@@ -46,6 +43,17 @@ export class AdminDashboard {
 
   constructor() {
     this.loadDashboard();
+    this.loadBalances();
+
+    this.realtimeService.connect(
+      () => this.refreshRequests(),
+      () => this.refreshRequests(),
+      () => this.refreshRequests()
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.realtimeService.disconnect();
   }
 
   loadDashboard(): void {
@@ -58,16 +66,11 @@ export class AdminDashboard {
         next: (response) => {
           const all = response.data.requests;
           this.allRequests.set(all);
-
           this.pendingRequests.set(all.filter(r => r.status === 'pending'));
-
           const myId = this.currentUser()?._id;
           const mine = all.filter(r => r.userId === myId);
           this.myRequests.set(mine);
-
-          // MOCK — reemplazar con llamada a LeavePolicyService
-          this.calculateBalances(mine);
-          // END MOCK
+          this.recalcBalances();
         },
         error: (error) => {
           this.pageError.set(error.error?.message ?? 'Could not load the dashboard.');
@@ -75,15 +78,29 @@ export class AdminDashboard {
       });
   }
 
-  // MOCK — este metodo entero se elimina cuando el backend devuelva los balances directamente
-  private calculateBalances(requests: TimeOffRequest[]): void {
-    const approved = requests.filter(r => r.status === 'approved');
+  private loadBalances(): void {
+    this.leavePolicyService.getPolicies().subscribe({
+      next: (response) => {
+        const policies = response.data.policies;
+        const vacation = policies.find(p => p.type === 'vacation');
+        const sick = policies.find(p => p.type === 'sick');
+        this.totalVacationDays.set(vacation?.totalDays ?? 0);
+        this.totalSickDays.set(sick?.totalDays ?? 0);
+        this.recalcBalances();
+      },
+      error: (error) => {
+        this.pageError.set(error.error?.message ?? 'Could not load leave policies.');
+      },
+    });
+  }
+
+  private recalcBalances(): void {
+    const approved = this.myRequests().filter(r => r.status === 'approved');
     const usedVacation = approved.filter(r => r.type === 'vacation').reduce((acc, r) => acc + r.totalDays, 0);
     const usedSick = approved.filter(r => r.type === 'sick').reduce((acc, r) => acc + r.totalDays, 0);
     this.vacationBalance.set(this.totalVacationDays() - usedVacation);
     this.sickBalance.set(this.totalSickDays() - usedSick);
   }
-  // END MOCK
 
   getCalendarDays(): (number | null)[] {
     const firstDay = new Date(this.currentYear(), this.currentMonth(), 1).getDay();
@@ -166,9 +183,7 @@ export class AdminDashboard {
         const myId = this.currentUser()?._id;
         const mine = all.filter(r => r.userId === myId);
         this.myRequests.set(mine);
-        // MOCK — reemplazar con llamada a LeavePolicyService
-        this.calculateBalances(mine);
-        // END MOCK
+        this.recalcBalances();
       },
       error: (error) => {
         this.pageError.set(error.error?.message ?? 'Could not reload requests.');
