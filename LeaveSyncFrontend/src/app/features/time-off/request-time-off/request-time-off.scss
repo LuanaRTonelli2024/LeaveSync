@@ -28,22 +28,6 @@
   color: #7a4a4a;
 }
 
-.ls-logout-btn {
-  font-size: 13px;
-  color: #C0392B;
-  background: transparent;
-  border: 1px solid #C0392B;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-
-  &:hover {
-    background: #C0392B;
-    color: #fff;
-  }
-}
-
 .ls-content {
   max-width: 1000px;
   margin: 0 auto;
@@ -124,7 +108,10 @@
   color: #555;
   transition: border-color 0.2s;
 
-  &:hover { border-color: #C0392B; color: #C0392B; }
+  &:hover {
+    border-color: #C0392B;
+    color: #C0392B;
+  }
 }
 
 .ls-cal-grid {
@@ -209,7 +196,9 @@ input[type='date'] {
   background: #fff;
   transition: border-color 0.2s;
 
-  &:focus { border-color: #C0392B; }
+  &:focus {
+    border-color: #C0392B;
+  }
 }
 
 .ls-balance-hint {
@@ -260,5 +249,8 @@ input[type='date'] {
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 
-  &:hover { border-color: #C0392B; color: #C0392B; }
+  &:hover {
+    border-color: #C0392B;
+    color: #C0392B;
+  }
 }
