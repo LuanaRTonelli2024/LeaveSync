@@ -198,10 +198,23 @@ export class AdminDashboard implements OnDestroy {
   getRequestsForDay(day: number | null): TimeOffRequest[] {
     if (!day) return [];
     const date = new Date(this.currentYear(), this.currentMonth(), day);
+
     return this.allRequests().filter(r => {
       if (r.status !== 'approved') return false;
-      const start = new Date(r.startDate);
-      const end = new Date(r.endDate);
+      const startParts = r.startDate.split('-');
+      const startYear = Number(startParts[0]);
+      const startMonth = Number(startParts[1]);
+      const startDay = Number(startParts[2]);
+
+      const endParts = r.endDate.split('-');
+      const endYear = Number(endParts[0]);
+      const endMonth = Number(endParts[1]);
+      const endDay = Number(endParts[2]);
+
+      const start = new Date(startYear, startMonth - 1, startDay);
+      const end = new Date(endYear, endMonth - 1, endDay);
+      end.setHours(23, 59, 59, 999);
+
       return date >= start && date <= end;
     });
   }
