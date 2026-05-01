@@ -121,7 +121,7 @@
             }">
             {{ request.status | titlecase }}
           </span>
-          <button class="ls-edit-btn" (click)="editRequest(request)">Edit</button>
+          <button class="ls-edit-btn" *ngIf="request.status !== 'denied'" (click)="editRequest(request)">Edit</button>
           <button class="ls-cancel-btn" (click)="cancelRequest(request._id)">Cancel</button>
         </div>
       </div>
