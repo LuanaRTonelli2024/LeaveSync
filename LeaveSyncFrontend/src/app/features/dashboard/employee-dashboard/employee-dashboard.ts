@@ -69,17 +69,14 @@ export class EmployeeDashboard implements OnDestroy {
   }
 
   private loadBalances(): void {
-    this.leavePolicyService.getPolicies().subscribe({
+    this.leavePolicyService.getMyBalance().subscribe({
       next: (response) => {
-        const policies = response.data.policies;
-        const vacation = policies.find(p => p.type === 'vacation');
-        const sick = policies.find(p => p.type === 'sick');
-        this.totalVacationDays.set(vacation?.totalDays ?? 0);
-        this.totalSickDays.set(sick?.totalDays ?? 0);
+        this.totalVacationDays.set(response.data.vacationDays);
+        this.totalSickDays.set(response.data.sickDays);
         this.recalcBalances();
       },
       error: (error) => {
-        this.pageError.set(error.error?.message ?? 'Could not load leave policies.');
+        this.pageError.set(error.error?.message ?? 'Could not load leave balance.');
       },
     });
   }

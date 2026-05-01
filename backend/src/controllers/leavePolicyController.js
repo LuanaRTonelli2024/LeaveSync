@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const LeavePolicy = require("../models/LeavePolicy");
+const User = require("../models/User");
 
 const getPolicies = async (req, res) => {
     try {
@@ -39,15 +40,56 @@ const getPolicy = async (req, res) => {
     }
 };
 
+const getMyBalance = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: "Unauthorized." });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Calculate years of service based on hireDate
+        const now = new Date();
+        const hireDate = new Date(user.hireDate);
+        const yearsOfService = Math.floor(
+            (now - hireDate) / (1000 * 60 * 60 * 24 * 365.25)
+        );
+
+        // Find the best matching vacation policy (highest minYears <= yearsOfService)
+        const vacationPolicies = await LeavePolicy.find({ type: "vacation" }).sort({ minYears: -1 });
+        const vacationPolicy = vacationPolicies.find(p => p.minYears <= yearsOfService);
+
+        // Find sick policy (use the one with lowest minYears, typically 0)
+        const sickPolicies = await LeavePolicy.find({ type: "sick" }).sort({ minYears: 1 });
+        const sickPolicy = sickPolicies[0] ?? null;
+
+        return res.status(200).json({
+            message: "Balance fetched successfully.",
+            data: {
+                vacationDays: vacationPolicy ? vacationPolicy.totalDays : 0,
+                sickDays: sickPolicy ? sickPolicy.totalDays : 0,
+                yearsOfService
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error while fetching balance." });
+    }
+};
+
 const createPolicy = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
             return res.status(401).json({ message: "Unauthorized." });
         }
 
-        const { type, totalDays, minYears, maxYears, description } = req.body;
+        const { type, totalDays, minYears, description } = req.body;
 
-        if (!type || !totalDays === undefined || minYears === undefined) {
+        if (!type || totalDays === undefined || minYears === undefined) {
             return res.status(400).json({ message: "Type, totalDays and minYears are required." });
         }
 
@@ -55,7 +97,6 @@ const createPolicy = async (req, res) => {
             type,
             totalDays,
             minYears,
-            maxYears,
             description
         });
 
@@ -81,13 +122,12 @@ const updatePolicy = async (req, res) => {
             return res.status(400).json({ message: "Invalid policy id." });
         }
 
-        const { type, totalDays, minYears, maxYears, description } = req.body;
+        const { type, totalDays, minYears, description } = req.body;
 
         const updatePayload = {};
         if ("type" in req.body) updatePayload.type = type;
         if ("totalDays" in req.body) updatePayload.totalDays = totalDays;
         if ("minYears" in req.body) updatePayload.minYears = minYears;
-        if ("maxYears" in req.body) updatePayload.maxYears = maxYears;
         if ("description" in req.body) updatePayload.description = description;
 
         const policy = await LeavePolicy.findByIdAndUpdate(id, updatePayload, {
@@ -139,4 +179,4 @@ const deletePolicy = async (req, res) => {
     }
 };
 
-module.exports = { getPolicies, getPolicy, createPolicy, updatePolicy, deletePolicy };
+module.exports = { getPolicies, getPolicy, getMyBalance, createPolicy, updatePolicy, deletePolicy };

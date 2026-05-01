@@ -56,11 +56,18 @@
             <option value="admin">Admin</option>
           </select>
         </div>
-
         <div class="ls-field">
           <label class="ls-label">Department <span class="ls-optional">(optional)</span></label>
           <input type="text" formControlName="department" placeholder="e.g. Engineering" />
         </div>
+      </div>
+
+      <div class="ls-field">
+        <label class="ls-label">Hire Date</label>
+        <input type="date" formControlName="hireDate" />
+        <span class="ls-error" *ngIf="form.controls.hireDate.touched && form.controls.hireDate.invalid">
+          Hire date is required
+        </span>
       </div>
 
       <span class="ls-error" *ngIf="errorMessage()">{{ errorMessage() }}</span>
