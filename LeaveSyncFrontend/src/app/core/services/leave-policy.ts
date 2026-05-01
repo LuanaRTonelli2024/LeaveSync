@@ -18,6 +18,10 @@ interface LeavePolicyPayload {
 interface MyBalance {
   vacationDays: number;
   sickDays: number;
+  totalVacationDays: number;
+  totalSickDays: number;
+  usedVacation: number;
+  usedSick: number;
   yearsOfService: number;
 }
 

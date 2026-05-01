@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const LeavePolicy = require("../models/LeavePolicy");
 const User = require("../models/User");
+const TimeOffRequest = require("../models/TimeOffRequest");
 
 const getPolicies = async (req, res) => {
     try {
@@ -47,31 +48,53 @@ const getMyBalance = async (req, res) => {
         }
 
         const user = await User.findById(req.user.id);
-
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }
 
+        const currentYear = new Date().getFullYear();
+
         // Calculate years of service based on hireDate
         const now = new Date();
         const hireDate = new Date(user.hireDate);
-        const yearsOfService = Math.floor(
-            (now - hireDate) / (1000 * 60 * 60 * 24 * 365.25)
-        );
+        const yearsOfService = Math.floor((now - hireDate) / (1000 * 60 * 60 * 24 * 365.25));
 
-        // Find the best matching vacation policy (highest minYears <= yearsOfService)
+        // Find the best matching vacation policy
         const vacationPolicies = await LeavePolicy.find({ type: "vacation" }).sort({ minYears: -1 });
         const vacationPolicy = vacationPolicies.find(p => p.minYears <= yearsOfService);
+        const totalVacationDays = vacationPolicy ? vacationPolicy.totalDays : 0;
 
-        // Find sick policy (use the one with lowest minYears, typically 0)
+        // Find sick policy
         const sickPolicies = await LeavePolicy.find({ type: "sick" }).sort({ minYears: 1 });
-        const sickPolicy = sickPolicies[0] ?? null;
+        const totalSickDays = sickPolicies[0] ? sickPolicies[0].totalDays : 0;
+
+        // Get approved requests for current year only
+        const approvedThisYear = await TimeOffRequest.find({
+            userId: req.user.id,
+            status: "approved",
+            startDate: {
+                $gte: new Date(`${currentYear}-01-01`),
+                $lte: new Date(`${currentYear}-12-31`)
+            }
+        });
+
+        const usedVacation = approvedThisYear
+            .filter(r => r.type === "vacation")
+            .reduce((acc, r) => acc + r.totalDays, 0);
+
+        const usedSick = approvedThisYear
+            .filter(r => r.type === "sick")
+            .reduce((acc, r) => acc + r.totalDays, 0);
 
         return res.status(200).json({
             message: "Balance fetched successfully.",
             data: {
-                vacationDays: vacationPolicy ? vacationPolicy.totalDays : 0,
-                sickDays: sickPolicy ? sickPolicy.totalDays : 0,
+                vacationDays: totalVacationDays - usedVacation,
+                sickDays: totalSickDays - usedSick,
+                totalVacationDays,
+                totalSickDays,
+                usedVacation,
+                usedSick,
                 yearsOfService
             }
         });
@@ -93,12 +116,7 @@ const createPolicy = async (req, res) => {
             return res.status(400).json({ message: "Type, totalDays and minYears are required." });
         }
 
-        const policy = await LeavePolicy.create({
-            type,
-            totalDays,
-            minYears,
-            description
-        });
+        const policy = await LeavePolicy.create({ type, totalDays, minYears, description });
 
         return res.status(201).json({
             message: "Policy created successfully.",

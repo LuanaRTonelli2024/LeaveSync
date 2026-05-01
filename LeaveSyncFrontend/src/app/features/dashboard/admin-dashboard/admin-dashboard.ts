@@ -82,7 +82,6 @@ export class AdminDashboard implements OnDestroy {
           const myId = this.currentUser()?._id;
           const mine = all.filter(r => r.userId === myId);
           this.myRequests.set(mine);
-          this.recalcBalances();
         },
         error: (error) => {
           this.pageError.set(error.error?.message ?? 'Could not load the dashboard.');
@@ -90,25 +89,18 @@ export class AdminDashboard implements OnDestroy {
       });
   }
 
-  private loadBalances(): void {
+  loadBalances(): void {
     this.leavePolicyService.getMyBalance().subscribe({
       next: (response) => {
-        this.totalVacationDays.set(response.data.vacationDays);
-        this.totalSickDays.set(response.data.sickDays);
-        this.recalcBalances();
+        this.vacationBalance.set(response.data.vacationDays);
+        this.sickBalance.set(response.data.sickDays);
+        this.totalVacationDays.set(response.data.totalVacationDays);
+        this.totalSickDays.set(response.data.totalSickDays);
       },
       error: (error) => {
         this.pageError.set(error.error?.message ?? 'Could not load leave balance.');
       },
     });
-  }
-
-  private recalcBalances(): void {
-    const approved = this.myRequests().filter(r => r.status === 'approved');
-    const usedVacation = approved.filter(r => r.type === 'vacation').reduce((acc, r) => acc + r.totalDays, 0);
-    const usedSick = approved.filter(r => r.type === 'sick').reduce((acc, r) => acc + r.totalDays, 0);
-    this.vacationBalance.set(this.totalVacationDays() - usedVacation);
-    this.sickBalance.set(this.totalSickDays() - usedSick);
   }
 
   // Policy management
@@ -269,7 +261,7 @@ export class AdminDashboard implements OnDestroy {
         const myId = this.currentUser()?._id;
         const mine = all.filter(r => r.userId === myId);
         this.myRequests.set(mine);
-        this.recalcBalances();
+        this.loadBalances();
       },
       error: (error) => {
         this.pageError.set(error.error?.message ?? 'Could not reload requests.');

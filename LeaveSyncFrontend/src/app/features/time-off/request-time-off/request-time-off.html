@@ -1,5 +1,4 @@
 <div class="ls-page">
-
   <nav class="ls-navbar">
     <img src="LeaveSync.png" alt="LeaveSync logo" class="ls-logo" />
     <div class="ls-navbar-right">
@@ -9,7 +8,6 @@
   </nav>
 
   <div class="ls-content">
-
     <div class="ls-header">
       <h1>{{ editingRequestId() ? 'Edit Request' : 'Time Off Request' }}</h1>
       <p>Select the type and days of leave of absence</p>
@@ -34,6 +32,7 @@
             class="ls-cal-day"
             [class.ls-empty]="!day"
             [class.ls-weekend]="day && isWeekend(day)"
+            [class.ls-past]="day && isPastDay(day)"
             [class.ls-selected]="day && isDaySelected(day)"
             [class.ls-selected-start]="day && isDayStart(day)"
             [class.ls-selected-end]="day && isDayEnd(day)"
@@ -44,7 +43,6 @@
       </div>
 
       <div class="ls-form-panel">
-
         <div class="ls-field">
           <label class="ls-label">Type of Leave</label>
           <select [(ngModel)]="selectedType" (ngModelChange)="onTypeChange($event)">
@@ -61,18 +59,18 @@
           <label class="ls-label">First Day of Leave</label>
           <input
             type="date"
+            [min]="todayString()"
             [(ngModel)]="pickerStart"
-            (ngModelChange)="onPickerStartChange($event)"
-          />
+            (ngModelChange)="onPickerStartChange($event)" />
         </div>
 
         <div class="ls-field">
           <label class="ls-label">Last Day of Leave</label>
           <input
             type="date"
+            [min]="todayString()"
             [(ngModel)]="pickerEnd"
-            (ngModelChange)="onPickerEndChange($event)"
-          />
+            (ngModelChange)="onPickerEndChange($event)" />
         </div>
 
         <div class="ls-days-summary" *ngIf="totalSelectedDays() > 0">
@@ -90,10 +88,8 @@
         <button class="ls-back-btn" (click)="goBack()">
           Cancel
         </button>
-
       </div>
 
     </div>
-
   </div>
 </div>

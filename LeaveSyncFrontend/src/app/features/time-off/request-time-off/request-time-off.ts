@@ -44,6 +44,8 @@ export class RequestTimeOff {
   readonly isSubmitting = signal(false);
   readonly pageError = signal('');
 
+  readonly today = new Date();
+
   readonly maxDays = computed(() =>
     this.selectedType() === 'vacation'
       ? this.availableVacationDays()
@@ -57,6 +59,8 @@ export class RequestTimeOff {
     return this.countWeekdays(start, end);
   });
 
+  readonly todayString = computed(() => this.toDateString(this.today));
+
   constructor() {
     this.loadBalances();
 
@@ -68,17 +72,16 @@ export class RequestTimeOff {
   }
 
   private loadBalances(): void {
-  this.leavePolicyService.getMyBalance().subscribe({
-    next: (response) => {
-      this.availableVacationDays.set(response.data.vacationDays);
-      this.availableSickDays.set(response.data.sickDays);
-    },
-    error: () => {
-      this.pageError.set('Could not load leave policies.');
-    },
-  });
-}
-
+    this.leavePolicyService.getMyBalance().subscribe({
+      next: (response) => {
+        this.availableVacationDays.set(response.data.vacationDays);
+        this.availableSickDays.set(response.data.sickDays);
+      },
+      error: () => {
+        this.pageError.set('Could not load leave policies.');
+      },
+    });
+  }
 
   private loadRequestForEditing(id: string): void {
     this.timeOffService.getMyRequests().subscribe({
@@ -138,6 +141,17 @@ export class RequestTimeOff {
     return date.getDay() === 0 || date.getDay() === 6;
   }
 
+  isPastDay(day: number): boolean {
+    const date = new Date(this.currentYear(), this.currentMonth(), day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  }
+
+  isDayDisabled(day: number): boolean {
+    return this.isWeekend(day) || this.isPastDay(day);
+  }
+
   isDaySelected(day: number): boolean {
     if (!day) return false;
     const date = new Date(this.currentYear(), this.currentMonth(), day);
@@ -159,7 +173,7 @@ export class RequestTimeOff {
   }
 
   onDayClick(day: number | null): void {
-    if (!day || this.isWeekend(day)) return;
+    if (!day || this.isDayDisabled(day)) return;
 
     const clicked = new Date(this.currentYear(), this.currentMonth(), day);
 
@@ -189,6 +203,14 @@ export class RequestTimeOff {
   onPickerStartChange(value: string): void {
     if (!value) return;
     const date = new Date(value + 'T00:00:00');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date < today) {
+      this.pageError.set('Start date cannot be in the past.');
+      return;
+    }
+
     this.selectedStart.set(date);
     this.selectedEnd.set(null);
     this.pickerEnd = '';
