@@ -12,8 +12,8 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'login', component: Login, canActivate: [guestGuard] },
   { path: 'register', component: Register, canActivate: [guestGuard] },
-  { path: 'dashboard', component: EmployeeDashboard, /*, canActivate: [authGuard]*/ },
-  { path: 'admin', component: AdminDashboard, /*, canActivate: [authGuard]*/ },
-  { path: 'request-time-off', component: RequestTimeOff, /*, canActivate: [authGuard]*/ },
+  { path: 'dashboard', component: EmployeeDashboard, canActivate: [authGuard] },
+  { path: 'admin', component: AdminDashboard, canActivate: [authGuard],
+  { path: 'request-time-off', component: RequestTimeOff, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' },
 ];

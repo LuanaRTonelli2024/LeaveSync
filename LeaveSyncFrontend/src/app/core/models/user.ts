@@ -6,4 +6,5 @@ export interface User {
     role: 'employee' | 'admin';
     department?: string;
     createdAt?: string;
+    hireDate: string;
 }
