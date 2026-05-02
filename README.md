@@ -69,7 +69,7 @@ cd LeaveSyncFrontend
 
 npm install
 
-3. Update the environment file at `src/environments/environment.development.ts`:
+3. Update the environment file at `src/environments/environment.ts`:
 
 export const environment = {
   apiUrl: 'http://localhost:5000'
